@@ -1,5 +1,6 @@
 #include "raylib.h"
 #include "map.h"
+#include<stdio.h>
 
 #define TILE_SIZE 16
 
@@ -7,19 +8,14 @@
 // #define TILE(col,row) (Rectangle){col*16,row*16,16,16}
 
 // Map size
-#define MAP_WIDTH 30
-#define MAP_HEIGHT 20
+// #define MAP_WIDTH 30
+// #define MAP_HEIGHT 20
 
-int main(void)
+
+    
+void InitTileRects(Rectangle tileRects[])
 {
-    InitWindow(800, 450, "Tilemap Example");
-
-    // Load tileset
-    Texture2D tileset = LoadTexture("tiles.png");
-
-    // MAP DATA
-    // numbers = tile IDs
-
+    
     // Tile locations in tileset
     
 
@@ -74,17 +70,11 @@ int main(void)
     tileRects[45] = TILE(3, 1); // SMALL TREE
     tileRects[46] = TILE(3, 2); // SMALL TREE
     tileRects[47] = TILE(8, 0); // butterfly
+}
 
-    SetTargetFPS(60);
-
-    while (!WindowShouldClose())
-    {
-        BeginDrawing();
-
-        ClearBackground(BLACK);
-
-        // DRAW MAP
-        for (int y = 0; y < MAP_HEIGHT; y++)
+void DRAWLAYERFIRST(Texture2D tileset,Rectangle tileRects[],int map[MAP_HEIGHT][MAP_WIDTH],int tilesize)
+{
+for (int y = 0; y < MAP_HEIGHT; y++)
         {
             for (int x = 0; x < MAP_WIDTH; x++)
             {
@@ -100,18 +90,21 @@ int main(void)
 
                     // destination on screen
                     (Rectangle){
-                        x * TILE_SIZE * 2,
-                        y * TILE_SIZE * 2,
+                        x * tilesize * 2,
+                        y *  tilesize* 2,
 
-                        TILE_SIZE * 2,
-                        TILE_SIZE * 2},
+                        tilesize * 2,
+                        tilesize* 2},
 
                     (Vector2){0, 0},
                     0.0f,
                     WHITE);
             }
         }
-        for (int y = 0; y < 20; y++)
+}
+void DRAWLAYERsecond(Texture2D tileset,Rectangle tileRects[],int basemaps[20][30],int tilesize)
+{
+    for (int y = 0; y < 20; y++)
         {
             for (int x = 0; x < 30; x++)
             {
@@ -127,18 +120,21 @@ int main(void)
 
                     // destination on screen
                     (Rectangle){
-                        x * TILE_SIZE * 2,
-                        y * TILE_SIZE * 2,
+                        x * tilesize * 2,
+                        y * tilesize * 2,
 
-                        TILE_SIZE * 2,
-                        TILE_SIZE * 2},
+                        tilesize * 2,
+                        tilesize * 2},
 
                     (Vector2){0, 0},
                     0.0f,
                     WHITE);
             }
         }
-        for (int y = 0; y < 20; y++)
+}
+void DRAWLAYERTHIRD(Texture2D tileset,Rectangle tileRects[],int maps[20][30],int tilesize)
+{
+    for (int y = 0; y < 20; y++)
         {
             for (int x = 0; x < 30; x++)
             {
@@ -154,18 +150,21 @@ int main(void)
 
                     // destination on screen
                     (Rectangle){
-                        x * TILE_SIZE * 2,
-                        y * TILE_SIZE * 2,
+                        x * tilesize * 2,
+                        y * tilesize * 2,
 
-                        TILE_SIZE * 2,
-                        TILE_SIZE * 2},
+                        tilesize * 2,
+                        tilesize * 2},
 
                     (Vector2){0, 0},
                     0.0f,
                     WHITE);
             }
         }
-        for (int y = 0; y < 20; y++)
+}
+void DRAWLAYER4TH(Texture2D tileset,Rectangle tileRects[],int mapoverlap[20][30],int tilesize)
+{
+    for (int y = 0; y < 20; y++)
         {
             for (int x = 0; x < 30; x++)
             {
@@ -181,26 +180,15 @@ int main(void)
 
                     // destination on screen
                     (Rectangle){
-                        x * TILE_SIZE * 2,
-                        y * TILE_SIZE * 2,
+                        x * tilesize * 2,
+                        y * tilesize * 2,
 
-                        TILE_SIZE * 2,
-                        TILE_SIZE * 2},
+                        tilesize * 2,
+                        tilesize * 2},
 
                     (Vector2){0, 0},
                     0.0f,
                     WHITE);
             }
         }
-
-        DrawText("Tilemap Example", 10, 10, 20, WHITE);
-
-        EndDrawing();
-    }
-
-    UnloadTexture(tileset);
-
-    CloseWindow();
-
-    return 0;
 }

@@ -1,19 +1,27 @@
 
-#define TILE_SIZE 16
-#include"raylib.h"
+#ifndef MAP_H
+#define MAP_H
+
+#include "raylib.h"
+
 
 // Tile selector
-#define TILE(col, row) (Rectangle){col * 16, row * 16, 16, 16}
+#define TILE(col, row) (Rectangle){(col) * 16, (row) * 16, 16, 16}
 #define TILE_SIZE 16
 
 // Map size
 #define MAP_WIDTH 30
 #define MAP_HEIGHT 20
-Rectangle tileRects[100];
+static Rectangle tileRects[100];
+void InitTileRects(Rectangle tileRects[]);
+void DRAWLAYERFIRST(Texture2D tileset, Rectangle tileRects[], int map[MAP_HEIGHT][MAP_WIDTH], int tilesize);
+void DRAWLAYERsecond(Texture2D tileset, Rectangle tileRects[], int basemaps[20][30], int tilesize);
+void DRAWLAYERTHIRD(Texture2D tileset, Rectangle tileRects[], int maps[20][30], int tilesize);
+void DRAWLAYER4TH(Texture2D tileset, Rectangle tileRects[], int mapoverlap[20][30], int tilesize);
     
 
-int map[MAP_HEIGHT][MAP_WIDTH] = {0};
-int basemaps[20][30] =
+static int map[MAP_HEIGHT][MAP_WIDTH] = {0};
+static int basemaps[20][30] =
     {
         {2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2},
         {5, 5, 5, 2, 2, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2},
@@ -37,7 +45,7 @@ int basemaps[20][30] =
         {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2, 2},
 
 };
-int maps[20][30] =
+static int maps[20][30] =
     {
         {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 27, 27, 27, 27, 27},
         {5, 5, 5, 2, 2, 2, 2, 2, 0, 0, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 27, 27, 27, 27, 27},
@@ -62,7 +70,7 @@ int maps[20][30] =
         
 };
 
-int mapoverlap[20][30] =
+static int mapoverlap[20][30] =
     {
         {9, 9, 10, 2, 2, 1, 1, 2, 2, 2, 47, 2, 2, 47, 2, 2, 24, 0, 0, 0, 25, 27, 27, 27, 27},
         {5, 5, 5, 2, 2, 1, 1, 2, 2, 2, 2, 2, 31, 31, 2, 2, 24, 0, 0, 0, 25, 27, 27, 47, 27},
@@ -85,3 +93,5 @@ int mapoverlap[20][30] =
         {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2},
         {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2, 2},
 };
+
+#endif // MAP_H

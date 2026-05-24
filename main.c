@@ -3,6 +3,8 @@
 #include"character.h"
 #include"character.c"
 #include"raygui.c"
+#include"map.c"
+#include"map.h"
 //#include"raygui.h"
 //const int screenWidth = 800;
    
@@ -16,6 +18,7 @@ int main(void)
 
     // Load texture
     Texture2D texture = LoadTexture("player.png");
+    Texture2D tileset = LoadTexture("tiles.png");
 
     int frameWidth = texture.width / 4;
     int frameHeight = texture.height / 4;
@@ -30,7 +33,7 @@ int main(void)
     float frameTime = 0.0f;
     float frameSpeed = 0.15f;
    
-
+    InitTileRects(tileRects);
     
     
    
@@ -54,8 +57,14 @@ int main(void)
         BeginDrawing();
         ClearBackground(BLACK);
        
+
+        //WHOLE MAP
+        DRAWLAYERFIRST(tileset,tileRects,map,TILE_SIZE);
+        DRAWLAYERsecond(tileset,tileRects,basemaps,TILE_SIZE);
+        DRAWLAYERTHIRD(tileset,tileRects,maps,TILE_SIZE);
+        DRAWLAYER4TH(tileset,tileRects,mapoverlap,TILE_SIZE);
+        //Character
         DrawCharacter(texture, frameRec,position,frameWidth,frameHeight);
-        
        
         DrawFPS(10,10);
         EndDrawing();

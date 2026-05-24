@@ -3,10 +3,10 @@
 #include"character.h"
 const int screenWidth = 800;
    
-const int screenHeight = 600;
+const int screenHeight = 450;
 void DrawCharacter(Texture2D texture,Rectangle frameRec,Vector2 position,int frameWidth,int frameHeight)
 {
-    Rectangle destRec = { position.x, position.y, frameWidth/2.0f, frameHeight/2.0f };
+    Rectangle destRec = { position.x, position.y, frameWidth/3.0f, frameHeight/3.0f };
     Vector2 origin = {0, 0};
     DrawTexturePro(texture, frameRec, destRec, origin, 0.0f, WHITE);    
 }
