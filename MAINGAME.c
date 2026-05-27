@@ -1,10 +1,11 @@
 #include "raylib.h"
 #include "raymath.h"
-#include"character.h"
+//#include"character.h"
 #include"character.c"
 #include"raygui.c"
 #include"map.c"
-#include"map.h"
+//#include"map.h"
+#include"collisiontest.c"
 //#include"raygui.h"
 //const int screenWidth = 800;
    
@@ -14,7 +15,7 @@ int main(void)
     
 
     InitWindow(screenWidth, screenHeight, "Pokemon Style Character - raylib (C)");
-    SetTargetFPS(144);
+    SetTargetFPS(44);
 
     // Load texture
     Texture2D texture = LoadTexture("player.png");
@@ -24,7 +25,7 @@ int main(void)
     int frameHeight = texture.height / 4;
 
     Rectangle frameRec = { 0, 0, frameWidth, frameHeight };
-    Vector2 position = { 400, 300 };
+    Vector2 position= { 700, 400 };
   
 
     int currentFrame = 0;
@@ -40,9 +41,25 @@ int main(void)
     while (!WindowShouldClose())
     {
         
+         Vector2 nextPos=position;
         
+       charactermovement(&nextPos,&currentRow,frameWidth,frameHeight,TILE_SIZE);
+
+        
+
+        
+
+// character hitbox corners
+        collisionfunc(&nextPos,&position,frameWidth,frameHeight,TILE_SIZE);
+
         //CHARACTER  MOVEMENT
-        charactermovement(&position,&currentRow);
+       // 
+        // int tileX = (position.x) / TILE_SIZE;
+        // int tileY = (position.y) / TILE_SIZE;
+        // if (!IsBlocked(tileX, tileY))
+        // {
+        //     pos=position;
+        // }
         // Clamp position to screen bounds
         clampcharacter(&position, frameWidth,frameHeight);
         // Animation timing

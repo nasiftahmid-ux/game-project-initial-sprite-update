@@ -2,7 +2,7 @@
 #include "map.h"
 #include<stdio.h>
 
-#define TILE_SIZE 16
+// #define TILE_SIZE 32
 
 // Tile selector
 // #define TILE(col,row) (Rectangle){col*16,row*16,16,16}
@@ -90,11 +90,11 @@ for (int y = 0; y < MAP_HEIGHT; y++)
 
                     // destination on screen
                     (Rectangle){
-                        x * tilesize * 2,
-                        y *  tilesize* 2,
+                        x * tilesize ,
+                        y *  tilesize,
 
-                        tilesize * 2,
-                        tilesize* 2},
+                        tilesize ,
+                        tilesize},
 
                     (Vector2){0, 0},
                     0.0f,
@@ -120,11 +120,11 @@ void DRAWLAYERsecond(Texture2D tileset,Rectangle tileRects[],int basemaps[20][30
 
                     // destination on screen
                     (Rectangle){
-                        x * tilesize * 2,
-                        y * tilesize * 2,
+                        x * tilesize ,
+                        y * tilesize ,
 
-                        tilesize * 2,
-                        tilesize * 2},
+                        tilesize ,
+                        tilesize },
 
                     (Vector2){0, 0},
                     0.0f,
@@ -150,11 +150,11 @@ void DRAWLAYERTHIRD(Texture2D tileset,Rectangle tileRects[],int maps[20][30],int
 
                     // destination on screen
                     (Rectangle){
-                        x * tilesize * 2,
-                        y * tilesize * 2,
+                        x * tilesize ,
+                        y * tilesize ,
 
-                        tilesize * 2,
-                        tilesize * 2},
+                        tilesize ,
+                        tilesize },
 
                     (Vector2){0, 0},
                     0.0f,
@@ -180,11 +180,11 @@ void DRAWLAYER4TH(Texture2D tileset,Rectangle tileRects[],int mapoverlap[20][30]
 
                     // destination on screen
                     (Rectangle){
-                        x * tilesize * 2,
-                        y * tilesize * 2,
+                        x * tilesize ,
+                        y * tilesize ,
 
-                        tilesize * 2,
-                        tilesize * 2},
+                        tilesize ,
+                        tilesize },
 
                     (Vector2){0, 0},
                     0.0f,
