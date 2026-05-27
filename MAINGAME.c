@@ -87,32 +87,8 @@ int main()
         DRAWLAYER4TH(tileset,tileRects,mapoverlap,TILE_SIZE);
         //Character
         DrawCharacter(texture, frameRec,position,frameWidth,frameHeight);
-        if (encounter)
-        {
-            DrawRectangle(
-                0,
-                0,
-                screenWidth,
-                screenHeight,
-                Fade(BLACK, 0.7f)
-            );
-
-            DrawText(
-                "MINOR HUNTER ZARIF Appeared!",
-                500,
-                250,
-                40,
-                WHITE
-            );
-
-            DrawText(
-                "Press ENTER to continue",
-                500,
-                320,
-                20,
-                YELLOW
-            );
-        }
+        DrawMinor(encounter,screenWidth,screenHeight);
+        
        
         DrawFPS(10,10);
         EndDrawing();

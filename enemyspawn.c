@@ -1,6 +1,35 @@
 #include "raylib.h"
 #include <stdbool.h>
 #include "enemyspawn.h"
+void DrawMinor(bool encounter,int screenWidth,int screenHeight)
+{
+if (encounter)
+        {
+            DrawRectangle(
+                0,
+                0,
+                screenWidth,
+                screenHeight,
+                Fade(BLACK, 0.7f)
+            );
+
+            DrawText(
+                "MINOR HUNTER ZARIF Appeared!",
+                500,
+                250,
+                40,
+                WHITE
+            );
+
+            DrawText(
+                "Press ENTER to continue",
+                500,
+                320,
+                20,
+                YELLOW
+            );
+        }
+}
 void enemyspawn(Vector2 *nextPos,bool *encounter,bool moving,int tilesize)
 {
     int tileX = nextPos->x / tilesize;
