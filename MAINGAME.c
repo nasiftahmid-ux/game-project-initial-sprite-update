@@ -10,12 +10,12 @@
 //const int screenWidth = 800;
    
 
-int main(void)
+int main()
 {
     
 
     InitWindow(screenWidth, screenHeight, "Pokemon Style Character - raylib (C)");
-    SetTargetFPS(44);
+    SetTargetFPS(144);
 
     // Load texture
     Texture2D texture = LoadTexture("player.png");
@@ -52,14 +52,7 @@ int main(void)
 // character hitbox corners
         collisionfunc(&nextPos,&position,frameWidth,frameHeight,TILE_SIZE);
 
-        //CHARACTER  MOVEMENT
-       // 
-        // int tileX = (position.x) / TILE_SIZE;
-        // int tileY = (position.y) / TILE_SIZE;
-        // if (!IsBlocked(tileX, tileY))
-        // {
-        //     pos=position;
-        // }
+       
         // Clamp position to screen bounds
         clampcharacter(&position, frameWidth,frameHeight);
         // Animation timing
