@@ -11,7 +11,7 @@ void DrawCharacter(Texture2D texture, Rectangle frameRec, Vector2 position, int 
     Vector2 origin = {0, 0};
     DrawTexturePro(texture, frameRec, destRec, origin, 0.0f, WHITE);
 }
-void charactermovement(Vector2 *nextPos, int *currentRow,int frameWidth,int frameHeight,int tilesize)
+void charactermovement(Vector2 *nextPos, int *currentRow,int frameWidth,int frameHeight,int tilesize,bool *moving)
 {
     //Vector2 nextPos = *position;
 
@@ -19,21 +19,25 @@ void charactermovement(Vector2 *nextPos, int *currentRow,int frameWidth,int fram
     {
         nextPos->x += 2;
         *currentRow = 3;
+        *moving=true;
     }
     else if (IsKeyDown(KEY_LEFT))
     {
         nextPos->x -= 2;
         *currentRow = 2;
+        *moving=true;
     }
     else if (IsKeyDown(KEY_UP))
     {
         nextPos->y -= 2;
         *currentRow = 1;
+        *moving=true;
     }
     else if (IsKeyDown(KEY_DOWN))
     {
         nextPos->y += 2;
         *currentRow = 0;
+        *moving=true;
     }
     
 }

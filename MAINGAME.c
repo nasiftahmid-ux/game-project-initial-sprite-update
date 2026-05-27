@@ -5,9 +5,16 @@
 #include"raygui.c"
 #include"map.c"
 //#include"map.h"
-#include"collisiontest.c"
+#include"collision.c"
 //#include"raygui.h"
 //const int screenWidth = 800;
+#include<stdbool.h>
+#include "enemyspawn.c"
+// RANDOM ENCOUNTER FUNCTION
+//====================================================
+
+
+
    
 
 int main()
@@ -33,6 +40,8 @@ int main()
 
     float frameTime = 0.0f;
     float frameSpeed = 0.15f;
+    //Battle STATE
+    bool encounter=false;
    
     InitTileRects(tileRects);
     
@@ -42,11 +51,14 @@ int main()
     {
         
          Vector2 nextPos=position;
-        
-       charactermovement(&nextPos,&currentRow,frameWidth,frameHeight,TILE_SIZE);
+         bool moving=false;
+    if(!encounter){
+       charactermovement(&nextPos,&currentRow,frameWidth,frameHeight,TILE_SIZE,&moving);
+    }
 
+        enemyspawn(&nextPos,&encounter,moving,TILE_SIZE);
         
-
+        
         
 
 // character hitbox corners
@@ -75,6 +87,32 @@ int main()
         DRAWLAYER4TH(tileset,tileRects,mapoverlap,TILE_SIZE);
         //Character
         DrawCharacter(texture, frameRec,position,frameWidth,frameHeight);
+        if (encounter)
+        {
+            DrawRectangle(
+                0,
+                0,
+                screenWidth,
+                screenHeight,
+                Fade(BLACK, 0.7f)
+            );
+
+            DrawText(
+                "MINOR HUNTER ZARIF Appeared!",
+                500,
+                250,
+                40,
+                WHITE
+            );
+
+            DrawText(
+                "Press ENTER to continue",
+                500,
+                320,
+                20,
+                YELLOW
+            );
+        }
        
         DrawFPS(10,10);
         EndDrawing();
