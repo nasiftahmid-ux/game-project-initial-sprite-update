@@ -1,6 +1,6 @@
 #include "raylib.h"
-#include "battle.h"
-#include "battle.c"
+//#include "battle.h"
+#include "headerfiles/battle.c"
 #include <time.h>
 #include <stdlib.h>
 

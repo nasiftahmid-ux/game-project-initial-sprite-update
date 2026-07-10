@@ -40,7 +40,7 @@ void InitBattleScene(BattleScene *battle, const char *playerName, const char *en
     battle->player.displayedHp = 100;
     battle->player.size = (Vector2){ 60, 90 };
     battle->player.baseColor = BLUE;
-    battle->player.basePos = (Vector2){ 150, 300 };
+    battle->player.basePos = (Vector2){120, 300 };
     battle->player.pos = battle->player.basePos;
     battle->player.tint = battle->player.baseColor;
     battle->player.flashTimer = 0.0f;

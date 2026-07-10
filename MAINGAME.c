@@ -1,15 +1,15 @@
 #include "raylib.h"
 #include "raymath.h"
 //#include"character.h"
-#include"character.c"
-#include"raygui.c"
-#include"map.c"
+#include "headerfiles/character.c"
+#include "raygui.c"
+#include"headerfiles/map.c"
 //#include"map.h"
-#include"collision.c"
+#include"headerfiles/collision.c"
 //#include"raygui.h"
 //const int screenWidth = 800;
 #include<stdbool.h>
-#include "enemyspawn.c"
+#include "headerfiles/enemyspawn.c"
 // RANDOM ENCOUNTER FUNCTION
 //====================================================
 
