@@ -21,12 +21,12 @@ int main()
 {
     
 
-    InitWindow(screenWidth, screenHeight, "Pokemon Style Character - raylib (C)");
+    InitWindow(screenWidth, screenHeight, "Jujutsu Kaisen - raylib (C)");
     SetTargetFPS(144);
 
     // Load texture
-    Texture2D texture = LoadTexture("player.png");
-    Texture2D tileset = LoadTexture("tiles.png");
+    Texture2D texture = LoadTexture("Assets&resources/player.png");
+    Texture2D tileset = LoadTexture("Assets&resources/tiles.png");
 
     int frameWidth = texture.width / 4;
     int frameHeight = texture.height / 4;
