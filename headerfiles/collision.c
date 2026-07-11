@@ -47,7 +47,7 @@ int IsBlocked(int x, int y)
     {
         return 1;
     }
-    else if(mapoverlap[y][x] == 10 || mapoverlap[y][x] == 8 || mapoverlap[y][x] == 7 || mapoverlap[y][x]==6 ||mapoverlap[y][x]==5)
+    else if(mapoverlap[y][x] == 10 || mapoverlap[y][x] == 8 || mapoverlap[y][x] == 7 || mapoverlap[y][x]==6 ||mapoverlap[y][x]==5 || mapoverlap[y][x]==35) 
     {
         return 1;
     }
