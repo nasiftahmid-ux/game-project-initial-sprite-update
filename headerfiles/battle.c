@@ -187,166 +187,136 @@ void UpdateBattleScene(BattleScene *battle, float dt)
     UpdateFlash(&battle->player, dt);
     UpdateFlash(&battle->enemy, dt);
 
-    switch (battle->state) {
-
-        case BATTLE_INTRO:
-            if (battle->stateTimer > 1.0f) {
-                battle->state = BATTLE_PLAYER_MENU;
-                battle->stateTimer = 0.0f;
-            }
-            break;
-
-        // --- Menu now supports arrow-key navigation + Enter to confirm ---
-        case BATTLE_PLAYER_MENU: {
-            if (IsKeyPressed(KEY_DOWN)) {
-                battle->selectedMoveIndex = (battle->selectedMoveIndex + 1) % battle->moveCount;
-            }
-            if (IsKeyPressed(KEY_UP)) {
-                battle->selectedMoveIndex =
-                    (battle->selectedMoveIndex - 1 + battle->moveCount) % battle->moveCount;
-            }
-
-            // number keys still work directly, for players who prefer them
-            int chosen = -1;
-            if (IsKeyPressed(KEY_ONE)) chosen = 0;
-            if (IsKeyPressed(KEY_TWO)) chosen = 1;
-            if (IsKeyPressed(KEY_THREE)) chosen = 2;
-            if (IsKeyPressed(KEY_FOUR)) chosen = 3;
-            if (IsKeyPressed(KEY_ENTER) || IsKeyPressed(KEY_SPACE)) chosen = battle->selectedMoveIndex;
-
-            if (chosen >= 0 && chosen < battle->moveCount) {
-                battle->pendingMove = &battle->playerMoves[chosen];
-                battle->state = BATTLE_PLAYER_ATTACK_IN;
-                battle->stateTimer = 0.0f;
-            }
-            break;
+    if (battle->state == BATTLE_INTRO) {
+        if (battle->stateTimer > 1.0f) {
+            battle->state = BATTLE_PLAYER_MENU;
+            battle->stateTimer = 0.0f;
+        }
+    }
+    else if (battle->state == BATTLE_PLAYER_MENU) {
+        if (IsKeyPressed(KEY_DOWN)) {
+            battle->selectedMoveIndex = (battle->selectedMoveIndex + 1) % battle->moveCount;
+        }
+        if (IsKeyPressed(KEY_UP)) {
+            battle->selectedMoveIndex =
+                (battle->selectedMoveIndex - 1 + battle->moveCount) % battle->moveCount;
         }
 
-        case BATTLE_PLAYER_ATTACK_IN: {
-            Vector2 target = {
-                battle->enemy.basePos.x - ATTACK_LUNGE_DIST,
-                battle->enemy.basePos.y
-            };
-            battle->player.pos = MoveToward(battle->player.pos, target,
-                                             ATTACK_MOVE_SPEED * dt);
-            if (Vec2Distance(battle->player.pos, target) < 1.0f) {
-                battle->state = BATTLE_PLAYER_ATTACK_HIT;
-                battle->stateTimer = 0.0f;
-            }
-            break;
+        int chosen = -1;
+        if (IsKeyPressed(KEY_ONE)) chosen = 0;
+        if (IsKeyPressed(KEY_TWO)) chosen = 1;
+        if (IsKeyPressed(KEY_THREE)) chosen = 2;
+        if (IsKeyPressed(KEY_FOUR)) chosen = 3;
+        if (IsKeyPressed(KEY_ENTER) || IsKeyPressed(KEY_SPACE)) chosen = battle->selectedMoveIndex;
+
+        if (chosen >= 0 && chosen < battle->moveCount) {
+            battle->pendingMove = &battle->playerMoves[chosen];
+            battle->state = BATTLE_PLAYER_ATTACK_IN;
+            battle->stateTimer = 0.0f;
         }
-
-        case BATTLE_PLAYER_ATTACK_HIT:
-            if (battle->stateTimer == dt) {
-                int dmg = RollDamage(battle->pendingMove);
-                battle->pendingDamage = dmg;
-                ApplyDamage(&battle->enemy, dmg);
-                snprintf(battle->messageText, sizeof(battle->messageText),
-                         "%s used %s!\n%s took %d damage!",
-                         battle->player.name, battle->pendingMove->name,
-                         battle->enemy.name, dmg);
-            }
-            if (battle->stateTimer > ATTACK_HIT_PAUSE) {
-                battle->state = BATTLE_PLAYER_ATTACK_OUT;
-                battle->stateTimer = 0.0f;
-            }
-            break;
-
-        case BATTLE_PLAYER_ATTACK_OUT: {
-            battle->player.pos = MoveToward(battle->player.pos, battle->player.basePos,
-                                             ATTACK_MOVE_SPEED * dt);
-            if (Vec2Distance(battle->player.pos, battle->player.basePos) < 1.0f) {
-                battle->player.pos = battle->player.basePos;
-                battle->state = BATTLE_MESSAGE_PAUSE;
-                battle->stateTimer = 0.0f;
-                battle->nextStateAfterMessage =
-                    (battle->enemy.currentHp <= 0) ? BATTLE_WIN : BATTLE_ENEMY_ATTACK_IN;
-            }
-            break;
+    }
+    else if (battle->state == BATTLE_PLAYER_ATTACK_IN) {
+        Vector2 target = {
+            battle->enemy.basePos.x - ATTACK_LUNGE_DIST,
+            battle->enemy.basePos.y
+        };
+        battle->player.pos = MoveToward(battle->player.pos, target, ATTACK_MOVE_SPEED * dt);
+        if (Vec2Distance(battle->player.pos, target) < 1.0f) {
+            battle->state = BATTLE_PLAYER_ATTACK_HIT;
+            battle->stateTimer = 0.0f;
         }
-
-        case BATTLE_MESSAGE_PAUSE:
-            if (battle->stateTimer > MESSAGE_PAUSE_DURATION) {
-                battle->state = battle->nextStateAfterMessage;
-                battle->stateTimer = 0.0f;
-
-                if (battle->state == BATTLE_ENEMY_ATTACK_IN) {
-                    battle->pendingMove = PickEnemyMove(battle);
-                }
-
-                // Roll rewards exactly once, the instant we enter BATTLE_WIN
-                if (battle->state == BATTLE_WIN) {
-                    battle->rewardExp = 40 + rand() % 21;    // 40-60
-                    battle->rewardCoins = 80 + rand() % 41;  // 80-120
-                }
-            }
-            break;
-
-        case BATTLE_ENEMY_ATTACK_IN: {
-            Vector2 target = {
-                battle->player.basePos.x + ATTACK_LUNGE_DIST,
-                battle->player.basePos.y
-            };
-            battle->enemy.pos = MoveToward(battle->enemy.pos, target,
-                                            ATTACK_MOVE_SPEED * dt);
-            if (Vec2Distance(battle->enemy.pos, target) < 1.0f) {
-                battle->state = BATTLE_ENEMY_ATTACK_HIT;
-                battle->stateTimer = 0.0f;
-            }
-            break;
+    }
+    else if (battle->state == BATTLE_PLAYER_ATTACK_HIT) {
+        if (battle->stateTimer == dt) {
+            int dmg = RollDamage(battle->pendingMove);
+            battle->pendingDamage = dmg;
+            ApplyDamage(&battle->enemy, dmg);
+            snprintf(battle->messageText, sizeof(battle->messageText),
+                     "%s used %s!\n%s took %d damage!",
+                     battle->player.name, battle->pendingMove->name,
+                     battle->enemy.name, dmg);
         }
-
-        case BATTLE_ENEMY_ATTACK_HIT:
-            if (battle->stateTimer == dt) {
-                int dmg = RollDamage(battle->pendingMove);
-                battle->pendingDamage = dmg;
-                ApplyDamage(&battle->player, dmg);
-                snprintf(battle->messageText, sizeof(battle->messageText),
-                         "%s used %s!\n%s took %d damage!",
-                         battle->enemy.name, battle->pendingMove->name,
-                         battle->player.name, dmg);
-            }
-            if (battle->stateTimer > ATTACK_HIT_PAUSE) {
-                battle->state = BATTLE_ENEMY_ATTACK_OUT;
-                battle->stateTimer = 0.0f;
-            }
-            break;
-
-        case BATTLE_ENEMY_ATTACK_OUT: {
-            battle->enemy.pos = MoveToward(battle->enemy.pos, battle->enemy.basePos,
-                                            ATTACK_MOVE_SPEED * dt);
-            if (Vec2Distance(battle->enemy.pos, battle->enemy.basePos) < 1.0f) {
-                battle->enemy.pos = battle->enemy.basePos;
-                battle->state = BATTLE_MESSAGE_PAUSE;
-                battle->stateTimer = 0.0f;
-                battle->nextStateAfterMessage =
-                    (battle->player.currentHp <= 0) ? BATTLE_LOSE : BATTLE_PLAYER_MENU;
-            }
-            break;
+        if (battle->stateTimer > ATTACK_HIT_PAUSE) {
+            battle->state = BATTLE_PLAYER_ATTACK_OUT;
+            battle->stateTimer = 0.0f;
         }
+    }
+    else if (battle->state == BATTLE_PLAYER_ATTACK_OUT) {
+        battle->player.pos = MoveToward(battle->player.pos, battle->player.basePos, ATTACK_MOVE_SPEED * dt);
+        if (Vec2Distance(battle->player.pos, battle->player.basePos) < 1.0f) {
+            battle->player.pos = battle->player.basePos;
+            battle->state = BATTLE_MESSAGE_PAUSE;
+            battle->stateTimer = 0.0f;
+            battle->nextStateAfterMessage =
+                (battle->enemy.currentHp <= 0) ? BATTLE_WIN : BATTLE_ENEMY_ATTACK_IN;
+        }
+    }
+    else if (battle->state == BATTLE_MESSAGE_PAUSE) {
+        if (battle->stateTimer > MESSAGE_PAUSE_DURATION) {
+            battle->state = battle->nextStateAfterMessage;
+            battle->stateTimer = 0.0f;
 
-        // --- Win/Lose now wait for confirmation, then hand off to BATTLE_DONE ---
-        case BATTLE_WIN:
-            if (battle->stateTimer > 0.5f &&
-                (IsKeyPressed(KEY_ENTER) || IsKeyPressed(KEY_SPACE))) {
-                battle->state = BATTLE_DONE;
+            if (battle->state == BATTLE_ENEMY_ATTACK_IN) {
+                battle->pendingMove = PickEnemyMove(battle);
             }
-            break;
-
-        case BATTLE_LOSE:
-            if (battle->stateTimer > 0.5f &&
-                (IsKeyPressed(KEY_ENTER) || IsKeyPressed(KEY_SPACE))) {
-                battle->state = BATTLE_DONE;
+            if (battle->state == BATTLE_WIN) {
+                battle->rewardExp = 40 + rand() % 21;
+                battle->rewardCoins = 80 + rand() % 41;
             }
-            break;
-
-        case BATTLE_DONE:
-            // Nothing to update -- the overworld (main.c or your game loop)
-            // is expected to check IsBattleOver() and tear down / transition out.
-            break;
+        }
+    }
+    else if (battle->state == BATTLE_ENEMY_ATTACK_IN) {
+        Vector2 target = {
+            battle->player.basePos.x + ATTACK_LUNGE_DIST,
+            battle->player.basePos.y
+        };
+        battle->enemy.pos = MoveToward(battle->enemy.pos, target, ATTACK_MOVE_SPEED * dt);
+        if (Vec2Distance(battle->enemy.pos, target) < 1.0f) {
+            battle->state = BATTLE_ENEMY_ATTACK_HIT;
+            battle->stateTimer = 0.0f;
+        }
+    }
+    else if (battle->state == BATTLE_ENEMY_ATTACK_HIT) {
+        if (battle->stateTimer == dt) {
+            int dmg = RollDamage(battle->pendingMove);
+            battle->pendingDamage = dmg;
+            ApplyDamage(&battle->player, dmg);
+            snprintf(battle->messageText, sizeof(battle->messageText),
+                     "%s used %s!\n%s took %d damage!",
+                     battle->enemy.name, battle->pendingMove->name,
+                     battle->player.name, dmg);
+        }
+        if (battle->stateTimer > ATTACK_HIT_PAUSE) {
+            battle->state = BATTLE_ENEMY_ATTACK_OUT;
+            battle->stateTimer = 0.0f;
+        }
+    }
+    else if (battle->state == BATTLE_ENEMY_ATTACK_OUT) {
+        battle->enemy.pos = MoveToward(battle->enemy.pos, battle->enemy.basePos, ATTACK_MOVE_SPEED * dt);
+        if (Vec2Distance(battle->enemy.pos, battle->enemy.basePos) < 1.0f) {
+            battle->enemy.pos = battle->enemy.basePos;
+            battle->state = BATTLE_MESSAGE_PAUSE;
+            battle->stateTimer = 0.0f;
+            battle->nextStateAfterMessage =
+                (battle->player.currentHp <= 0) ? BATTLE_LOSE : BATTLE_PLAYER_MENU;
+        }
+    }
+    else if (battle->state == BATTLE_WIN) {
+        if (battle->stateTimer > 0.5f &&
+            (IsKeyPressed(KEY_ENTER) || IsKeyPressed(KEY_SPACE))) {
+            battle->state = BATTLE_DONE;
+        }
+    }
+    else if (battle->state == BATTLE_LOSE) {
+        if (battle->stateTimer > 0.5f &&
+            (IsKeyPressed(KEY_ENTER) || IsKeyPressed(KEY_SPACE))) {
+            battle->state = BATTLE_DONE;
+        }
+    }
+    else if (battle->state == BATTLE_DONE) {
+        // কিছুই করার নেই
     }
 }
-
 void DrawBattleScene(BattleScene *battle)
 {
     ClearBackground(RAYWHITE);
