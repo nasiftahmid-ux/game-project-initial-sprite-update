@@ -50,22 +50,22 @@ void InitBattleScene(BattleScene *battle, const char *playerName, const char *en
     battle->enemy.maxHp = 80;
     battle->enemy.currentHp = 80;
     battle->enemy.displayedHp = 80;
-    battle->enemy.size = (Vector2){ 60, 60 };
+    battle->enemy.size = (Vector2){ 60, 70 };
     battle->enemy.baseColor = MAROON;
     battle->enemy.basePos = (Vector2){ 600, 200 };
     battle->enemy.pos = battle->enemy.basePos;
     battle->enemy.tint = battle->enemy.baseColor;
     battle->enemy.flashTimer = 0.0f;
 
-    strcpy(battle->playerMoves[0].name, "Slash");
-    battle->playerMoves[0].minDamage = 10;
+    strcpy(battle->playerMoves[0].name, "Nasif's Slash");
+    battle->playerMoves[0].minDamage = 5;
     battle->playerMoves[0].maxDamage = 15;
 
-    strcpy(battle->playerMoves[1].name, "Heavy Strike");
-    battle->playerMoves[1].minDamage = 18;
-    battle->playerMoves[1].maxDamage = 25;
+    strcpy(battle->playerMoves[1].name, "MOOD SWING STRIKE");
+    battle->playerMoves[1].minDamage = 16;
+    battle->playerMoves[1].maxDamage = 17;
 
-    strcpy(battle->playerMoves[2].name, "Fire Blast");
+    strcpy(battle->playerMoves[2].name, "LAGA 50TA NOTE");
     battle->playerMoves[2].minDamage = 20;
     battle->playerMoves[2].maxDamage = 30;
 
@@ -76,19 +76,23 @@ void InitBattleScene(BattleScene *battle, const char *playerName, const char *en
     battle->moveCount = 4;
     battle->selectedMoveIndex = 0;
 
-    strcpy(battle->enemyMoves[0].name, "Bite");
+    strcpy(battle->enemyMoves[0].name, "MINOR Bite");
     battle->enemyMoves[0].minDamage = 8;
-    battle->enemyMoves[0].maxDamage = 14;
+    battle->enemyMoves[0].maxDamage = 9;
 
-    strcpy(battle->enemyMoves[1].name, "Claw Swipe");
+    strcpy(battle->enemyMoves[1].name, "MINOR Swipe");
     battle->enemyMoves[1].minDamage = 6;
-    battle->enemyMoves[1].maxDamage = 11;
+    battle->enemyMoves[1].maxDamage = 19;
 
-    strcpy(battle->enemyMoves[2].name, "Growl Slam");
+    strcpy(battle->enemyMoves[2].name, "MINOR Growl Slam");
     battle->enemyMoves[2].minDamage = 14;
-    battle->enemyMoves[2].maxDamage = 20;
+    battle->enemyMoves[2].maxDamage = 25;
 
-    battle->enemyMoveCount = 3;
+    strcpy(battle->enemyMoves[3].name, "ONLY MINOR SLAM");
+    battle->enemyMoves[3].minDamage = 16;
+    battle->enemyMoves[3].maxDamage = 17;
+
+    battle->enemyMoveCount = 4;
 
     battle->pendingMove = NULL;
     battle->pendingDamage = 0;

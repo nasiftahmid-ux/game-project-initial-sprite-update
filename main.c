@@ -12,7 +12,7 @@ int main(void)
     SetTargetFPS(60);
 
     BattleScene battle;
-    InitBattleScene(&battle, "Hero", "Goblin");
+    InitBattleScene(&battle, "NASIF", "ZARIF");
 
     while (!WindowShouldClose()) {
         float dt = GetFrameTime();
