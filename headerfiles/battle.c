@@ -125,21 +125,33 @@ void ApplyDamage(Character *target, int amount)
 
 void UpdateHpBarLerp(Character *c, float dt)
 {
-    if (c->displayedHp > c->currentHp) {
+    if (c->displayedHp > c->currentHp)
+    {
         c->displayedHp -= (int)(HP_LERP_SPEED * dt);
-        if (c->displayedHp < c->currentHp) c->displayedHp = c->currentHp;
-    } else if (c->displayedHp < c->currentHp) {
+        if (c->displayedHp < c->currentHp) 
+        {
+            c->displayedHp = c->currentHp;
+        }
+
+    } 
+    else if (c->displayedHp < c->currentHp) //ei condition dewa hoise heal er jonno jodi ami heal move add kori
+    {
         c->displayedHp += (int)(HP_LERP_SPEED * dt);
-        if (c->displayedHp > c->currentHp) c->displayedHp = c->currentHp;
+        if (c->displayedHp > c->currentHp) 
+        {
+            c->displayedHp = c->currentHp;
+        }
     }
 }
 
 static void UpdateFlash(Character *c, float dt)
 {
-    if (c->flashTimer > 0.0f) {
+    if (c->flashTimer > 0.0f) 
+    {
         c->flashTimer -= dt;
         c->tint = RED;
-        if (c->flashTimer <= 0.0f) {
+        if (c->flashTimer <= 0.0f) 
+        {
             c->flashTimer = 0.0f;
             c->tint = c->baseColor;
         }
