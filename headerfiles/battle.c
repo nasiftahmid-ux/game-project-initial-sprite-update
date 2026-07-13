@@ -9,7 +9,7 @@
 #define MESSAGE_PAUSE_DURATION 1.2f
 #define ATTACK_MOVE_SPEED 900.0f
 #define ATTACK_HIT_PAUSE  0.2f
-#define ATTACK_LUNGE_DIST 80.0f
+#define ATTACK_LUNGE_DIST 100.0f
 
 static float Vec2Distance(Vector2 a, Vector2 b)
 {
@@ -38,21 +38,21 @@ void InitBattleScene(BattleScene *battle, const char *playerName, const char *en
     battle->player.maxHp = 100;
     battle->player.currentHp = 100;
     battle->player.displayedHp = 100;
-    battle->player.size = (Vector2){ 60, 90 };
+    battle->player.size = (Vector2){ 90, 90 };
     battle->player.baseColor = BLUE;
-    battle->player.basePos = (Vector2){120, 300 };
+    battle->player.basePos = (Vector2){150, 500 };
     battle->player.pos = battle->player.basePos;
     battle->player.tint = battle->player.baseColor;
     battle->player.flashTimer = 0.0f;
 
     strncpy(battle->enemy.name, enemyName, MAX_NAME_LEN - 1);
     battle->enemy.name[MAX_NAME_LEN - 1] = '\0';
-    battle->enemy.maxHp = 80;
-    battle->enemy.currentHp = 80;
-    battle->enemy.displayedHp = 80;
-    battle->enemy.size = (Vector2){ 60, 70 };
+    battle->enemy.maxHp = 100;
+    battle->enemy.currentHp = 100;
+    battle->enemy.displayedHp = 100;
+    battle->enemy.size = (Vector2){ 80, 80 };
     battle->enemy.baseColor = MAROON;
-    battle->enemy.basePos = (Vector2){ 600, 200 };
+    battle->enemy.basePos = (Vector2){ 1140, 150 };
     battle->enemy.pos = battle->enemy.basePos;
     battle->enemy.tint = battle->enemy.baseColor;
     battle->enemy.flashTimer = 0.0f;
@@ -172,11 +172,11 @@ void DrawHpBar(Character *c, Vector2 barPos, int barWidth, int barHeight)
     DrawRectangle((int)barPos.x, (int)barPos.y, (int)(barWidth * pct), barHeight, fillColor);
     DrawRectangleLines((int)barPos.x, (int)barPos.y, barWidth, barHeight, BLACK);
 
-    DrawText(c->name, (int)barPos.x, (int)barPos.y - 20, 18, BLACK);
+    DrawText(c->name, (int)barPos.x, (int)barPos.y - 20, 25, BLACK);
 
     char hpText[16];
     snprintf(hpText, sizeof(hpText), "%d/%d", c->currentHp, c->maxHp);
-    DrawText(hpText, (int)barPos.x, (int)barPos.y + barHeight + 2, 14, DARKGRAY);
+    DrawText(hpText, (int)barPos.x, (int)barPos.y + barHeight + 2, 25, DARKGRAY);
 }
 
 static Move *PickEnemyMove(BattleScene *battle)
@@ -219,7 +219,7 @@ void UpdateBattleScene(BattleScene *battle, float dt)
         if (IsKeyPressed(KEY_TWO)) chosen = 1;
         if (IsKeyPressed(KEY_THREE)) chosen = 2;
         if (IsKeyPressed(KEY_FOUR)) chosen = 3;
-        if (IsKeyPressed(KEY_ENTER) || IsKeyPressed(KEY_SPACE)) chosen = battle->selectedMoveIndex;
+        if (IsKeyPressed(KEY_ENTER)) chosen = battle->selectedMoveIndex;
 
         if (chosen >= 0 && chosen < battle->moveCount) {
             battle->pendingMove = &battle->playerMoves[chosen];
@@ -259,8 +259,16 @@ void UpdateBattleScene(BattleScene *battle, float dt)
             battle->player.pos = battle->player.basePos;
             battle->state = BATTLE_MESSAGE_PAUSE;
             battle->stateTimer = 0.0f;
-            battle->nextStateAfterMessage =
-                (battle->enemy.currentHp <= 0) ? BATTLE_WIN : BATTLE_ENEMY_ATTACK_IN;
+            if(battle->enemy.currentHp<=0)
+            {
+                battle->nextStateAfterMessage= BATTLE_WIN;
+            }
+            else
+            {
+                battle->nextStateAfterMessage=BATTLE_ENEMY_ATTACK_IN;
+            }
+            // battle->nextStateAfterMessage =
+            //     (battle->enemy.currentHp <= 0) ? BATTLE_WIN : BATTLE_ENEMY_ATTACK_IN;
         }
     }
     else if (battle->state == BATTLE_MESSAGE_PAUSE) {
@@ -272,8 +280,8 @@ void UpdateBattleScene(BattleScene *battle, float dt)
                 battle->pendingMove = PickEnemyMove(battle);
             }
             if (battle->state == BATTLE_WIN) {
-                battle->rewardExp = 40 + rand() % 21;
-                battle->rewardCoins = 80 + rand() % 41;
+                battle->rewardExp = 60 + rand() % 21;
+                battle->rewardCoins = 100 + rand() % 41;
             }
         }
     }
@@ -309,8 +317,16 @@ void UpdateBattleScene(BattleScene *battle, float dt)
             battle->enemy.pos = battle->enemy.basePos;
             battle->state = BATTLE_MESSAGE_PAUSE;
             battle->stateTimer = 0.0f;
-            battle->nextStateAfterMessage =
-                (battle->player.currentHp <= 0) ? BATTLE_LOSE : BATTLE_PLAYER_MENU;
+            if(battle->player.currentHp<=0)
+            {
+                battle->nextStateAfterMessage= BATTLE_LOSE;
+            }
+            else
+            {
+                battle->nextStateAfterMessage=BATTLE_PLAYER_MENU;
+            }
+            // battle->nextStateAfterMessage =
+            //     (battle->player.currentHp <= 0) ? BATTLE_LOSE : BATTLE_PLAYER_MENU;
         }
     }
     else if (battle->state == BATTLE_WIN) {
@@ -325,35 +341,35 @@ void UpdateBattleScene(BattleScene *battle, float dt)
             battle->state = BATTLE_DONE;
         }
     }
-    else if (battle->state == BATTLE_DONE) {
-        // কিছুই করার নেই
-    }
+    // else if (battle->state == BATTLE_DONE) {
+    //     // কিছুই করার নেই
+    // }
 }
 void DrawBattleScene(BattleScene *battle)
 {
     ClearBackground(RAYWHITE);
-    DrawLine(0, 400, 800, 400, LIGHTGRAY);
+    DrawLine(0, 700, 2000, 700, BLUE);
 
     DrawRectangleV(battle->player.pos, battle->player.size, battle->player.tint);
     DrawRectangleV(battle->enemy.pos, battle->enemy.size, battle->enemy.tint);
 
-    DrawHpBar(&battle->player, (Vector2){ 60, 420 }, 200, 20);
-    DrawHpBar(&battle->enemy, (Vector2){ 540, 60 }, 200, 20);
+    DrawHpBar(&battle->player, (Vector2){ 60, 620 }, 300, 30);
+    DrawHpBar(&battle->enemy, (Vector2){ 1140, 60 }, 300, 30);
 
     if (battle->state == BATTLE_PLAYER_MENU) {
-        DrawRectangle(0, 460, 800, 140, (Color){ 20, 20, 20, 220 });
-        DrawText("Fight", 20, 470, 22, WHITE);
+        DrawRectangle(0, 700, 2000 , 700, (Color){ 20, 20, 20, 220 });
+        DrawText("Fight", 20, 710, 32, WHITE);
         for (int i = 0; i < battle->moveCount; i++) {
             char line[64];
             snprintf(line, sizeof(line), "%d  %s", i + 1, battle->playerMoves[i].name);
             Color col = (i == battle->selectedMoveIndex) ? YELLOW : WHITE;
             // little arrow marker on the selected move, like a real menu cursor
             if (i == battle->selectedMoveIndex) {
-                DrawText(">", 5, 500 + i * 22, 18, YELLOW);
+                DrawText(">", 5, 760 + i * 22, 28, YELLOW);
             }
-            DrawText(line, 20, 500 + i * 22, 18, col);
+            DrawText(line, 20, 760 + i * 22, 28, col);
         }
-        DrawText("Arrows + Enter, or press 1-4", 500, 590, 14, GRAY);
+        DrawText("Arrows + Enter, or press 1-4", 500, 800, 24, GRAY);
     }
 
     bool showMessageBox =
@@ -364,27 +380,27 @@ void DrawBattleScene(BattleScene *battle)
         battle->state == BATTLE_ENEMY_ATTACK_OUT;
 
     if (showMessageBox) {
-        DrawRectangle(0, 460, 800, 140, (Color){ 20, 20, 20, 220 });
-        DrawText(battle->messageText, 20, 490, 20, WHITE);
+        DrawRectangle(0, 700, 2000, 700, (Color){ 20, 20, 20, 220 });
+        DrawText(battle->messageText, 20, 750, 30, WHITE);
     }
 
     if (battle->state == BATTLE_WIN) {
-        DrawRectangle(0, 460, 800, 140, (Color){ 20, 20, 20, 220 });
-        DrawText("YOU WIN!", 20, 470, 32, GOLD);
+        DrawRectangle(0, 700, 2000, 700, (Color){ 20, 20, 20, 220 });
+        DrawText("YOU WIN!", 20, 710, 42, GOLD);
 
         char rewardLine[64];
         snprintf(rewardLine, sizeof(rewardLine), "EXP +%d", battle->rewardExp);
-        DrawText(rewardLine, 20, 515, 20, WHITE);
+        DrawText(rewardLine, 20, 750, 30, WHITE);
 
         snprintf(rewardLine, sizeof(rewardLine), "Coins +%d", battle->rewardCoins);
-        DrawText(rewardLine, 20, 540, 20, WHITE);
+        DrawText(rewardLine, 20, 790, 30, WHITE);
 
-        DrawText("Press Enter to continue", 20, 575, 16, GRAY);
+        DrawText("Press Enter to continue", 20, 850, 16, GRAY);
     }
 
     if (battle->state == BATTLE_LOSE) {
-        DrawRectangle(0, 460, 800, 140, (Color){ 20, 20, 20, 220 });
-        DrawText("YOU LOST...", 20, 490, 32, RED);
-        DrawText("Press Enter to continue", 20, 550, 16, GRAY);
+        DrawRectangle(0, 700, 2000, 700, (Color){ 20, 20, 20, 220 });
+        DrawText("YOU LOST...", 20, 710, 32, RED);
+        DrawText("Press Enter to continue", 20, 850, 16, GRAY);
     }
 }

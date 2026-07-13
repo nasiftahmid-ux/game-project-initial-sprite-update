@@ -50,7 +50,7 @@ void enemyspawn(Vector2 *nextPos,bool *encounter,bool moving,int tilesize)
         }
 
         //ENCOUNTER RESET
-    if (*encounter && IsKeyPressed(KEY_ENTER))
+    if (*encounter && IsKeyPressed(KEY_SPACE))
         {
             *encounter = false;
         }
@@ -61,7 +61,7 @@ bool CheckPokemonEncounter(int currentTile, bool isMoving)
     if (currentTile == 0 && isMoving)
     {
         // Random encounter chance
-        int randomChance = GetRandomValue(0, 500);
+        int randomChance = GetRandomValue(0, 100);
 
         // Encounter trigger
         if (randomChance == 6)

@@ -8,7 +8,7 @@ int main(void)
 {
     srand((unsigned int)time(NULL));
 
-    InitWindow(800, 600, "Battle Test - Part 3");
+    InitWindow(1500, 900, "Battle Test - Part 3");
     SetTargetFPS(60);
 
     BattleScene battle;
