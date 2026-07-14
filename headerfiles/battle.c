@@ -18,7 +18,7 @@
 
 #define ATTACK_FRAME_COUNT 4
 #define ATTACK_FRAME_SPEED 0.08f
-#define IDLE_FRAME_SPEED 0.15f
+#define IDLE_FRAME_SPEED 0.20f
 
 static float Vec2Distance(Vector2 a, Vector2 b)
 {
@@ -73,6 +73,7 @@ void UpdateCharacterAnimation(Character *c, float dt)
 static void InitCharacterSprite(Character *c, const char *spritePath, int frameCols, int frameRows, bool flip)
 {
     c->sprite = LoadTexture(spritePath);
+    SetTextureFilter(c->sprite, TEXTURE_FILTER_POINT);
     c->frameWidth = c->sprite.width / frameCols;
     c->frameHeight = c->sprite.height / frameRows;
     c->flipHorizontal = flip;
@@ -225,11 +226,11 @@ void DrawHpBar(Character *c, Vector2 barPos, int barWidth, int barHeight)
     DrawRectangle((int)barPos.x, (int)barPos.y, (int)(barWidth * pct), barHeight, fillColor);
     DrawRectangleLines((int)barPos.x, (int)barPos.y, barWidth, barHeight, BLACK);
 
-    DrawText(c->name, (int)barPos.x, (int)barPos.y - 20, 25, BLACK);
+    DrawText(c->name, (int)barPos.x, (int)barPos.y - 20, 25,WHITE);
 
     char hpText[16];
     snprintf(hpText, sizeof(hpText), "%d/%d", c->currentHp, c->maxHp);
-    DrawText(hpText, (int)barPos.x, (int)barPos.y + barHeight + 2, 25, DARKGRAY);
+    DrawText(hpText, (int)barPos.x, (int)barPos.y + barHeight + 2, 25, WHITE);
 }
 
 static Move *PickEnemyMove(BattleScene *battle)
@@ -414,22 +415,22 @@ void UpdateBattleScene(BattleScene *battle, float dt)
 }
 void DrawBattleScene(BattleScene *battle)
 {
-    ClearBackground(RAYWHITE);
+    ClearBackground(BLACK);
     DrawLine(0, 700, 2000, 700, BLUE);
     float scale =2.0f;
     Rectangle playerDest = {
     battle->player.pos.x,
     battle->player.pos.y,
-    battle->player.frameWidth * scale,
-    battle->player.frameHeight * scale
+    battle->player.frameWidth/ scale,
+    battle->player.frameHeight / scale
 };
 Vector2 origin={0,0};
     DrawTexturePro(battle->player.sprite, battle->player.frameRec,playerDest, origin,0.0f ,battle->player.tint);
     Rectangle enemyDest = {
     battle->enemy.pos.x,
     battle->enemy.pos.y,
-    battle->enemy.frameWidth * scale,
-    battle->enemy.frameHeight * scale
+    battle->enemy.frameWidth / scale,
+    battle->enemy.frameHeight / scale
 };
     DrawTexturePro(battle->enemy.sprite, battle->enemy.frameRec, enemyDest,origin,0.0f, battle->enemy.tint);
     DrawHpBar(&battle->player, (Vector2){ 60, 620 }, 300, 30);
@@ -441,7 +442,16 @@ Vector2 origin={0,0};
         for (int i = 0; i < battle->moveCount; i++) {
             char line[64];
             snprintf(line, sizeof(line), "%d  %s", i + 1, battle->playerMoves[i].name);
-            Color col = (i == battle->selectedMoveIndex) ? YELLOW : WHITE;
+            Color col;
+            if(i==battle->selectedMoveIndex)
+            {
+                 col=YELLOW;
+            }
+            else
+            {
+                 col= WHITE;
+            }
+            // Color col = (i == battle->selectedMoveIndex) ? YELLOW : WHITE;
             // little arrow marker on the selected move, like a real menu cursor
             if (i == battle->selectedMoveIndex) {
                 DrawText(">", 5, 760 + i * 22, 28, YELLOW);
