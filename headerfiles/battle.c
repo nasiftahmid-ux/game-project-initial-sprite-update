@@ -11,6 +11,15 @@
 #define ATTACK_HIT_PAUSE  0.2f
 #define ATTACK_LUNGE_DIST 100.0f
 
+//ANIMATION CONVERSION
+#define ANIME_ROW_IDLE 0
+#define ANIME_ROW_ATTACK 1
+#define ANIME_ROW_HURT 2
+
+#define ATTACK_FRAME_COUNT 4
+#define ATTACK_FRAME_SPEED 0.08f
+#define IDLE_FRAME_SPEED 0.15f
+
 static float Vec2Distance(Vector2 a, Vector2 b)
 {
     float dx = a.x - b.x, dy = a.y - b.y;
@@ -31,32 +40,75 @@ static Vector2 MoveToward(Vector2 current, Vector2 target, float maxDist)
     return (Vector2){ current.x + dx * t, current.y + dy * t };
 }
 
-void InitBattleScene(BattleScene *battle, const char *playerName, const char *enemyName)
+void SetCharacterAnim(Character *c, int row, int frameCount, float frameSpeed)
+{
+    c->animRow = row;
+    c->frameCount = frameCount;
+    c->frameSpeed = frameSpeed;
+    c->currentFrame = 0;
+    c->frameTimer = 0.0f;
+    c->frameRec.x = 0;
+    c->frameRec.y = (float)(row * c->frameHeight);
+}
+void UpdateCharacterAnimation(Character *c, float dt)
+{
+    c->frameTimer += dt;
+    if (c->frameTimer >= c->frameSpeed) {
+        c->frameTimer = 0.0f;
+        c->currentFrame = (c->currentFrame + 1) % c->frameCount;
+        c->frameRec.x = (float)(c->currentFrame * c->frameWidth);
+        c->frameRec.y = (float)(c->animRow * c->frameHeight);
+    }
+    // negative width mirrors the sprite horizontally when drawn
+    if(c->flipHorizontal)
+    {
+        c->frameRec.width=-(float)c->frameWidth;
+    }
+    else
+    {
+        c->frameRec.width=(float)c->frameWidth;
+    }
+    
+}
+static void InitCharacterSprite(Character *c, const char *spritePath, int frameCols, int frameRows, bool flip)
+{
+    c->sprite = LoadTexture(spritePath);
+    c->frameWidth = c->sprite.width / frameCols;
+    c->frameHeight = c->sprite.height / frameRows;
+    c->flipHorizontal = flip;
+    c->frameRec = (Rectangle){ 0, 0, (float)c->frameWidth, (float)c->frameHeight };
+    SetCharacterAnim(c, ANIME_ROW_IDLE, frameCols, IDLE_FRAME_SPEED);
+}
+
+void InitBattleScene(BattleScene *battle,
+                      const char *playerName, const char *playerSpritePath,
+                      int playerFrameCols, int playerFrameRows,
+                      const char *enemyName, const char *enemySpritePath,
+                      int enemyFrameCols, int enemyFrameRows)
 {
     strncpy(battle->player.name, playerName, MAX_NAME_LEN - 1);
     battle->player.name[MAX_NAME_LEN - 1] = '\0';
     battle->player.maxHp = 100;
     battle->player.currentHp = 100;
     battle->player.displayedHp = 100;
-    battle->player.size = (Vector2){ 90, 90 };
-    battle->player.baseColor = BLUE;
+    
     battle->player.basePos = (Vector2){150, 500 };
     battle->player.pos = battle->player.basePos;
-    battle->player.tint = battle->player.baseColor;
+    battle->player.tint = WHITE;
     battle->player.flashTimer = 0.0f;
+    InitCharacterSprite(&battle->player, playerSpritePath, playerFrameCols, playerFrameRows, false);
 
     strncpy(battle->enemy.name, enemyName, MAX_NAME_LEN - 1);
     battle->enemy.name[MAX_NAME_LEN - 1] = '\0';
     battle->enemy.maxHp = 100;
     battle->enemy.currentHp = 100;
     battle->enemy.displayedHp = 100;
-    battle->enemy.size = (Vector2){ 80, 80 };
-    battle->enemy.baseColor = MAROON;
+   
     battle->enemy.basePos = (Vector2){ 1140, 150 };
     battle->enemy.pos = battle->enemy.basePos;
-    battle->enemy.tint = battle->enemy.baseColor;
+    battle->enemy.tint = WHITE;
     battle->enemy.flashTimer = 0.0f;
-
+    InitCharacterSprite(&battle->enemy, enemySpritePath, enemyFrameCols, enemyFrameRows, true);
     strcpy(battle->playerMoves[0].name, "Nasif's Slash");
     battle->playerMoves[0].minDamage = 5;
     battle->playerMoves[0].maxDamage = 15;
@@ -108,7 +160,8 @@ void InitBattleScene(BattleScene *battle, const char *playerName, const char *en
 
 void UnloadBattleScene(BattleScene *battle)
 {
-    (void)battle;
+    UnloadTexture(battle->player.sprite);
+    UnloadTexture(battle->enemy.sprite);
 }
 
 int RollDamage(Move *move)
@@ -153,7 +206,7 @@ static void UpdateFlash(Character *c, float dt)
         if (c->flashTimer <= 0.0f) 
         {
             c->flashTimer = 0.0f;
-            c->tint = c->baseColor;
+            c->tint = WHITE;
         }
     }
 }
@@ -198,6 +251,8 @@ void UpdateBattleScene(BattleScene *battle, float dt)
     UpdateHpBarLerp(&battle->enemy, dt);
     UpdateFlash(&battle->player, dt);
     UpdateFlash(&battle->enemy, dt);
+    UpdateCharacterAnimation(&battle->player, dt);
+    UpdateCharacterAnimation(&battle->enemy, dt);
 
     if (battle->state == BATTLE_INTRO) {
         if (battle->stateTimer > 1.0f) {
@@ -228,6 +283,9 @@ void UpdateBattleScene(BattleScene *battle, float dt)
         }
     }
     else if (battle->state == BATTLE_PLAYER_ATTACK_IN) {
+        if (battle->stateTimer == dt) {
+                SetCharacterAnim(&battle->player, ANIME_ROW_ATTACK, ATTACK_FRAME_COUNT, ATTACK_FRAME_SPEED);
+            }
         Vector2 target = {
             battle->enemy.basePos.x - ATTACK_LUNGE_DIST,
             battle->enemy.basePos.y
@@ -243,6 +301,7 @@ void UpdateBattleScene(BattleScene *battle, float dt)
             int dmg = RollDamage(battle->pendingMove);
             battle->pendingDamage = dmg;
             ApplyDamage(&battle->enemy, dmg);
+            SetCharacterAnim(&battle->enemy, ANIME_ROW_HURT, 1, 1.0f);
             snprintf(battle->messageText, sizeof(battle->messageText),
                      "%s used %s!\n%s took %d damage!",
                      battle->player.name, battle->pendingMove->name,
@@ -257,6 +316,8 @@ void UpdateBattleScene(BattleScene *battle, float dt)
         battle->player.pos = MoveToward(battle->player.pos, battle->player.basePos, ATTACK_MOVE_SPEED * dt);
         if (Vec2Distance(battle->player.pos, battle->player.basePos) < 1.0f) {
             battle->player.pos = battle->player.basePos;
+            SetCharacterAnim(&battle->player, ANIME_ROW_IDLE, 4, IDLE_FRAME_SPEED);
+            SetCharacterAnim(&battle->enemy, ANIME_ROW_IDLE, 4, IDLE_FRAME_SPEED);
             battle->state = BATTLE_MESSAGE_PAUSE;
             battle->stateTimer = 0.0f;
             if(battle->enemy.currentHp<=0)
@@ -286,6 +347,9 @@ void UpdateBattleScene(BattleScene *battle, float dt)
         }
     }
     else if (battle->state == BATTLE_ENEMY_ATTACK_IN) {
+        if (battle->stateTimer == dt) {
+                SetCharacterAnim(&battle->enemy, ANIME_ROW_ATTACK, ATTACK_FRAME_COUNT, ATTACK_FRAME_SPEED);
+            }
         Vector2 target = {
             battle->player.basePos.x + ATTACK_LUNGE_DIST,
             battle->player.basePos.y
@@ -301,6 +365,7 @@ void UpdateBattleScene(BattleScene *battle, float dt)
             int dmg = RollDamage(battle->pendingMove);
             battle->pendingDamage = dmg;
             ApplyDamage(&battle->player, dmg);
+            SetCharacterAnim(&battle->player, ANIME_ROW_HURT, 1, 1.0f);
             snprintf(battle->messageText, sizeof(battle->messageText),
                      "%s used %s!\n%s took %d damage!",
                      battle->enemy.name, battle->pendingMove->name,
@@ -315,6 +380,8 @@ void UpdateBattleScene(BattleScene *battle, float dt)
         battle->enemy.pos = MoveToward(battle->enemy.pos, battle->enemy.basePos, ATTACK_MOVE_SPEED * dt);
         if (Vec2Distance(battle->enemy.pos, battle->enemy.basePos) < 1.0f) {
             battle->enemy.pos = battle->enemy.basePos;
+            SetCharacterAnim(&battle->enemy, ANIME_ROW_IDLE, 4, IDLE_FRAME_SPEED);
+            SetCharacterAnim(&battle->player, ANIME_ROW_IDLE, 4, IDLE_FRAME_SPEED);
             battle->state = BATTLE_MESSAGE_PAUSE;
             battle->stateTimer = 0.0f;
             if(battle->player.currentHp<=0)
@@ -350,9 +417,8 @@ void DrawBattleScene(BattleScene *battle)
     ClearBackground(RAYWHITE);
     DrawLine(0, 700, 2000, 700, BLUE);
 
-    DrawRectangleV(battle->player.pos, battle->player.size, battle->player.tint);
-    DrawRectangleV(battle->enemy.pos, battle->enemy.size, battle->enemy.tint);
-
+    DrawTextureRec(battle->player.sprite, battle->player.frameRec, battle->player.pos, battle->player.tint);
+    DrawTextureRec(battle->enemy.sprite, battle->enemy.frameRec, battle->enemy.pos, battle->enemy.tint);
     DrawHpBar(&battle->player, (Vector2){ 60, 620 }, 300, 30);
     DrawHpBar(&battle->enemy, (Vector2){ 1140, 60 }, 300, 30);
 

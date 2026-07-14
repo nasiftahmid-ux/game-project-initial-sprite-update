@@ -1,44 +1,27 @@
+#include <windows.h>
+#include <dwmapi.h>
 #include "raylib.h"
 
-int main()
+int main(void)
 {
-    const int screenWidth = 1500;
-    const int screenHeight = 850;
+    InitWindow(800, 600, "My Game");
 
-    InitWindow(screenWidth, screenHeight, "Scrolling Background");
+    HWND hwnd = GetWindowHandle();
 
-    Texture2D bg = LoadTexture("redbal.png");
-
-    float bgX = 0;
-    float speed = 1.0f;
-
-    SetTargetFPS(60);
+    BOOL dark = TRUE;
+    DwmSetWindowAttribute(
+        hwnd,
+        DWMWA_USE_IMMERSIVE_DARK_MODE,
+        &dark,
+        sizeof(dark)
+    );
 
     while (!WindowShouldClose())
     {
-        // Background move
-        bgX -= speed;
-
-        // Reset when fully gone
-        if (bgX <= -bg.width)
-        {
-            bgX = 0;
-        }
-
         BeginDrawing();
-
-        ClearBackground(WHITE);
-
-        // Draw 2 copies
-        DrawTexture(bg, bgX, 0, WHITE);
-        DrawTexture(bg, bgX + bg.width, 0, WHITE);
-
+        ClearBackground(BLACK);
         EndDrawing();
     }
 
-    UnloadTexture(bg);
-
     CloseWindow();
-
-    return 0;
 }

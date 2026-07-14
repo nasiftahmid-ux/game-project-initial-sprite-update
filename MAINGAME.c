@@ -21,6 +21,9 @@ int main()
 {
 
     InitWindow(screenWidth, screenHeight, "Jujutsu Kaisen - raylib (C)");
+    Image icon=LoadImage("Assets&resources/jjk2.png");
+    SetWindowIcon(icon);
+    UnloadImage(icon);
     SetTargetFPS(60);
     srand((unsigned int)time(NULL));
     // Load texture
@@ -74,7 +77,10 @@ int main()
             UpdateFrame(&frameRec, &currentFrame, &currentRow, frameWidth, frameHeight);
             if (encounter && IsKeyPressed(KEY_SPACE))
             {
-                InitBattleScene(&battle, "Nasif", "Zarif");
+                InitBattleScene(&battle,
+                    "NASIF", "Assets&resources/hero_battle.png", 4, 3,
+                    "ZARIF", "Assets&resources/goblin_battle.png", 4, 3
+                );
                 mode = MODE_BATTLE;
             }
         }

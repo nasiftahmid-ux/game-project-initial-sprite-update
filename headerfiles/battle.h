@@ -12,8 +12,17 @@ typedef struct Character {
     int currentHp;
     int displayedHp;
 
-    Vector2 size;
-    Color baseColor;
+    Texture2D sprite;
+    int frameWidth;
+    int frameHeight;
+    Rectangle frameRec;
+    int frameCount;
+    int currentFrame;
+    float frameTimer;
+    float frameSpeed;
+    int animRow;
+    bool flipHorizontal;
+    
     Vector2 basePos;
     Vector2 pos;
     Color tint;
@@ -66,7 +75,10 @@ typedef struct BattleScene {
     int rewardCoins;
 } BattleScene;
 
-void InitBattleScene(BattleScene *battle, const char *playerName, const char *enemyName);
+void InitBattleScene(BattleScene *battle, const char *playerName, 
+                    const char *playerSpritePath,int playerFrameCols,
+                    int PlayerFrameRows,const char *enemyName,
+                    const char *enemySpritePath,int enemyFrameCols,int enemyFrameRows);
 void UnloadBattleScene(BattleScene *battle);
 
 void UpdateBattleScene(BattleScene *battle, float dt);
@@ -74,7 +86,9 @@ void DrawBattleScene(BattleScene *battle);
 
 void UpdateHpBarLerp(Character *c, float dt);
 void DrawHpBar(Character *c, Vector2 barPos, int barWidth, int barHeight);
-
+//Animation Helpers
+void UpdateCharacterAnimation(Character *c, float dt);
+void SetCharacterAnim(Character *c, int row, int frameCount, float frameSpeed);
 int RollDamage(Move *move);
 void ApplyDamage(Character *target, int amount);
 
