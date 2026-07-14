@@ -92,7 +92,7 @@ void InitBattleScene(BattleScene *battle,
     battle->player.currentHp = 100;
     battle->player.displayedHp = 100;
     
-    battle->player.basePos = (Vector2){150, 500 };
+    battle->player.basePos = (Vector2){150, 400 };
     battle->player.pos = battle->player.basePos;
     battle->player.tint = WHITE;
     battle->player.flashTimer = 0.0f;
@@ -117,24 +117,24 @@ void InitBattleScene(BattleScene *battle,
     battle->playerMoves[1].minDamage = 16;
     battle->playerMoves[1].maxDamage = 17;
 
-    strcpy(battle->playerMoves[2].name, "LAGA 50TA NOTE");
+    strcpy(battle->playerMoves[2].name, "BUSTY  RED  HEAD");
     battle->playerMoves[2].minDamage = 20;
     battle->playerMoves[2].maxDamage = 30;
 
-    strcpy(battle->playerMoves[3].name, "Poke");
+    strcpy(battle->playerMoves[3].name, "NASIF X ZARIF Poke");
     battle->playerMoves[3].minDamage = 3;
     battle->playerMoves[3].maxDamage = 6;
 
     battle->moveCount = 4;
     battle->selectedMoveIndex = 0;
 
-    strcpy(battle->enemyMoves[0].name, "MINOR Bite");
+    strcpy(battle->enemyMoves[0].name, " MINOR Bite ");
     battle->enemyMoves[0].minDamage = 8;
     battle->enemyMoves[0].maxDamage = 9;
 
-    strcpy(battle->enemyMoves[1].name, "MINOR Swipe");
-    battle->enemyMoves[1].minDamage = 6;
-    battle->enemyMoves[1].maxDamage = 19;
+    strcpy(battle->enemyMoves[1].name, " MINOR TERRITORY ");
+    battle->enemyMoves[1].minDamage = 20;
+    battle->enemyMoves[1].maxDamage = 40;
 
     strcpy(battle->enemyMoves[2].name, "MINOR Growl Slam");
     battle->enemyMoves[2].minDamage = 14;
@@ -416,9 +416,22 @@ void DrawBattleScene(BattleScene *battle)
 {
     ClearBackground(RAYWHITE);
     DrawLine(0, 700, 2000, 700, BLUE);
-
-    DrawTextureRec(battle->player.sprite, battle->player.frameRec, battle->player.pos, battle->player.tint);
-    DrawTextureRec(battle->enemy.sprite, battle->enemy.frameRec, battle->enemy.pos, battle->enemy.tint);
+    float scale =2.0f;
+    Rectangle playerDest = {
+    battle->player.pos.x,
+    battle->player.pos.y,
+    battle->player.frameWidth * scale,
+    battle->player.frameHeight * scale
+};
+Vector2 origin={0,0};
+    DrawTexturePro(battle->player.sprite, battle->player.frameRec,playerDest, origin,0.0f ,battle->player.tint);
+    Rectangle enemyDest = {
+    battle->enemy.pos.x,
+    battle->enemy.pos.y,
+    battle->enemy.frameWidth * scale,
+    battle->enemy.frameHeight * scale
+};
+    DrawTexturePro(battle->enemy.sprite, battle->enemy.frameRec, enemyDest,origin,0.0f, battle->enemy.tint);
     DrawHpBar(&battle->player, (Vector2){ 60, 620 }, 300, 30);
     DrawHpBar(&battle->enemy, (Vector2){ 1140, 60 }, 300, 30);
 
