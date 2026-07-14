@@ -50,10 +50,10 @@ void enemyspawn(Vector2 *nextPos,bool *encounter,bool moving,int tilesize)
         }
 
         //ENCOUNTER RESET
-    if (*encounter && IsKeyPressed(KEY_SPACE))
-        {
-            *encounter = false;
-        }
+    // if (*encounter && IsKeyPressed(KEY_SPACE))
+    //     {
+    //         *encounter = false;
+    //     }
 }
 bool CheckPokemonEncounter(int currentTile, bool isMoving)
 {

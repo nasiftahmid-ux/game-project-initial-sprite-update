@@ -13,6 +13,7 @@
 #include "headerfiles/battle.c"
 #include <time.h>
 #include <stdlib.h>
+#include "headerfiles/gamemode.h"
 // RANDOM ENCOUNTER FUNCTION
 //====================================================
 
@@ -42,79 +43,76 @@ int main()
 
     InitTileRects(tileRects);
     BattleScene battle;
-    InitBattleScene(&battle, "NASIF", "ZARIF");
+    GameMode mode;
 
     while (!WindowShouldClose())
     {
 
-        Vector2 nextPos = position;
-        bool moving = false;
-        if (!encounter)
-        {
-            charactermovement(&nextPos, &currentRow, frameWidth, frameHeight, TILE_SIZE, &moving);
-        }
-
-        enemyspawn(&nextPos, &encounter, moving, TILE_SIZE);
+        
 
         float dt = GetFrameTime();
 
-        if (!IsBattleOver(&battle))
+        if (mode == MODE_OVERWORLD)
         {
-            UpdateBattleScene(&battle, dt);
+            Vector2 nextPos = position;
+            bool moving = false;
+            if (!encounter)
+            {
+                charactermovement(&nextPos, &currentRow, frameWidth, frameHeight, TILE_SIZE, &moving);
+            }
+
+            enemyspawn(&nextPos, &encounter, moving, TILE_SIZE);
+            // character hitbox corners
+            collisionfunc(&nextPos, &position, frameWidth, frameHeight, TILE_SIZE);
+
+            // Clamp position to screen bounds
+            clampcharacter(&position, frameWidth, frameHeight);
+            // Animation timing
+            animation(&frameTime, &currentFrame, frameSpeed);
+
+            // Update frame rectangle
+            UpdateFrame(&frameRec, &currentFrame, &currentRow, frameWidth, frameHeight);
+            if (encounter && IsKeyPressed(KEY_SPACE))
+            {
+                InitBattleScene(&battle, "Nasif", "Zarif");
+                mode = MODE_BATTLE;
+            }
+        }
+        else if (mode == MODE_BATTLE)
+        {
+            if (!IsBattleOver(&battle))
+            {
+                UpdateBattleScene(&battle, dt);
+            }
+            else
+            {
+                encounter = false;
+                mode = MODE_OVERWORLD;
+            }
         }
 
-        // character hitbox corners
-        collisionfunc(&nextPos, &position, frameWidth, frameHeight, TILE_SIZE);
-
-        // Clamp position to screen bounds
-        clampcharacter(&position, frameWidth, frameHeight);
-        // Animation timing
-        animation(&frameTime, &currentFrame, frameSpeed);
-
-        // Update frame rectangle
-        UpdateFrame(&frameRec, &currentFrame, &currentRow, frameWidth, frameHeight);
+       
 
         BeginDrawing();
         ClearBackground(BLACK);
 
-        // WHOLE MAP
-        DRAWLAYERFIRST(tileset, tileRects, map, TILE_SIZE);
-        DRAWLAYERsecond(tileset, tileRects, basemaps, TILE_SIZE);
-        DRAWLAYERTHIRD(tileset, tileRects, maps, TILE_SIZE);
-        DRAWLAYER4TH(tileset, tileRects, mapoverlap, TILE_SIZE);
-        // Character
-        DrawCharacter(texture, frameRec, position, frameWidth, frameHeight);
-        DrawMinor(encounter, screenWidth, screenHeight);
-        if (IsKeyDown(KEY_SPACE))
+        if (mode == MODE_OVERWORLD)
         {
-            InitBattleScene(&battle, "NASIF", "ZARIF");
-            while (1)
-            {
-                
-                float dt = GetFrameTime();
-
-                if (!IsBattleOver(&battle))
-                {
-                    UpdateBattleScene(&battle, dt);
-                }
-
-                BeginDrawing();
-                if (!IsBattleOver(&battle))
-                {
-                    DrawBattleScene(&battle);
-                }
-                else
-                {
-                    ClearBackground(RAYWHITE);
-                    // encounter=false;
-                    break;
-                    
-                }
-                EndDrawing();
-            
-            }
-            
+            DRAWLAYERFIRST(tileset, tileRects, map, TILE_SIZE);
+            DRAWLAYERsecond(tileset, tileRects, basemaps, TILE_SIZE);
+            DRAWLAYERTHIRD(tileset, tileRects, maps, TILE_SIZE);
+            DRAWLAYER4TH(tileset, tileRects, mapoverlap, TILE_SIZE);
+            // Character
+            DrawCharacter(texture, frameRec, position, frameWidth, frameHeight);
+           DrawMinor(encounter, screenWidth, screenHeight);
         }
+        
+        else if (mode == MODE_BATTLE)
+        { 
+            
+            DrawBattleScene(&battle);
+        }
+        
         DrawFPS(10, 10);
         EndDrawing();
     }
