@@ -58,6 +58,8 @@ int main()
     InitTileRects(tileRects);
     BattleScene battle;
     GameMode mode;
+    bool isMenuOpen   = false;  // KEY_I toggles the bag screen
+    int  selectedSlot = 0;      // cursor position inside the bag grid
 
     PlayerStats playerstats;
     // int playerMaxHp = 100;
@@ -80,7 +82,47 @@ int main()
         {
             Vector2 nextPos = position;
             bool moving = false;
-            if (!encounter)
+            // ---- KEY_I: toggle bag menu ----
+            if (IsKeyPressed(KEY_I))
+            {
+                isMenuOpen  = !isMenuOpen;
+                selectedSlot = 0;   // reset cursor on each open
+            }
+
+            if (isMenuOpen)
+            {
+                // Route all directional input to the bag grid cursor.
+                // Wrapping on left/right; clamping on up/down (grid rows).
+                int total = playerInventory.usedSlots;
+                if (total > 0)
+                {
+                    if (IsKeyPressed(KEY_RIGHT) || IsKeyPressed(KEY_D))
+                        selectedSlot = (selectedSlot + 1) % total;
+                    if (IsKeyPressed(KEY_LEFT)  || IsKeyPressed(KEY_A))
+                        selectedSlot = (selectedSlot - 1 + total) % total;
+                    if (IsKeyPressed(KEY_DOWN)  || IsKeyPressed(KEY_S))
+                    {
+                        int nxt = selectedSlot + INV_GRID_COLS;
+                        if (nxt < total) selectedSlot = nxt;
+                    }
+                    if (IsKeyPressed(KEY_UP)    || IsKeyPressed(KEY_W))
+                    {
+                        int prv = selectedSlot - INV_GRID_COLS;
+                        if (prv >= 0) selectedSlot = prv;
+                    }
+
+                    // ENTER or SPACE: consume the highlighted item
+                    if (IsKeyPressed(KEY_ENTER) || IsKeyPressed(KEY_SPACE))
+                    {
+                        UseItemFromInventory(&playerInventory, selectedSlot, &playerstats);
+                        // If the used slot was depleted and compacted, clamp cursor
+                        if (selectedSlot >= playerInventory.usedSlots &&
+                            playerInventory.usedSlots > 0)
+                            selectedSlot = playerInventory.usedSlots - 1;
+                    }
+                }
+            }
+            else if (!encounter)
             {
                 charactermovement(&nextPos, &currentRow, frameWidth, frameHeight, TILE_SIZE, &moving);
             }
@@ -101,7 +143,8 @@ int main()
             UpdateCollectibles(collectibleList, collectibleCount, dt);
             CheckCollectibleCollisions(collectibleList, collectibleCount, position.x, position.y, &playerInventory);
 
-            if (encounter && IsKeyPressed(KEY_SPACE))
+            // Start battle only when menu is closed (SPACE is also used to use items)
+            if (encounter && !isMenuOpen && IsKeyPressed(KEY_SPACE))
             {
                 InitBattleScene(&battle,
                     "NASIF", "Assets&resources/gojo-nasif.png", 4, 3,
@@ -153,8 +196,13 @@ int main()
 
             
            DrawMinor(encounter, screenWidth, screenHeight);
-           DrawPlayerHud(&playerstats,1140,20);
-           DrawInventoryHUD(&playerInventory,1140,90);
+           DrawPlayerHud(&playerstats, 1140, 20);
+           // InventoryHUD moved down to clear the new CE bar in DrawPlayerHud
+           DrawInventoryHUD(&playerInventory, 1140, 130);
+
+           // Full-screen bag overlay – drawn absolutely last so it sits on top
+           if (isMenuOpen)
+               DrawInventoryMenu(&playerInventory, selectedSlot, potionTextures);
 
         }
         

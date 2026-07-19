@@ -5,11 +5,13 @@
 
 typedef struct PlayerStats {
     char name[32];
-    int level;
-    int currentHp;
-    int maxHp;
-    int currentExp;
-    int expToNextLevel;
+    int  level;
+    int  currentHp;
+    int  maxHp;
+    int  currentExp;
+    int  expToNextLevel;
+    int  cursedEnergy;        // current cursed energy
+    int  maxCursedEnergy;     // maximum cursed energy
 } PlayerStats;
 
 void InitPlayerStats(PlayerStats *stats, const char *name);
